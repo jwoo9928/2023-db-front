@@ -13,7 +13,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { useRecoilState } from "recoil";
 import { LoginState } from "../../store/state";
-import Navigator from "../../navigator";
+import useNavigator from "../../navigator";
 
 function Copyright(props: any) {
   return (
@@ -38,7 +38,7 @@ const defaultTheme = createTheme();
 
 const Login = () => {
   const [, setIslogin] = useRecoilState<boolean>(LoginState);
-  const navigate = Navigator();
+  const navigate = useNavigator();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {

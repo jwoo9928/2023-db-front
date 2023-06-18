@@ -7,18 +7,30 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
-import { ImageList, ImageListItem, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useRecoilState } from "recoil";
-import { SearchParams } from "../../types/store";
 import { SearchState } from "../../store/state";
+import { DateRange } from "@mui/x-date-pickers-pro";
+import axios from "axios";
+import useNavigator from "../../navigator";
 
 const defaultTheme = createTheme();
 
 type VehicleType = "소형" | "대형" | "승합" | "SUV" | "전기차";
 
 const Main = () => {
+  const navigator = useNavigator();
   const [vehicleTypes, setVehicleTypes] = React.useState<VehicleType[]>([]);
   const [searchParams, setSearchParams] = useRecoilState(SearchState);
+
+  React.useEffect(() => {
+    if (searchParams) {
+      setSearchParams({
+        ...searchParams,
+        types: vehicleTypes,
+      });
+    }
+  }, [vehicleTypes]);
 
   const controlButtons = React.useCallback(
     (type: VehicleType | "전체") => {
@@ -48,7 +60,12 @@ const Main = () => {
     [vehicleTypes]
   );
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {};
+  const handleSubmit = async () => {
+    const result = await axios.post("http://127.0.0.1:3308/rentcar/search", {
+      ...searchParams,
+    });
+    navigator.moveToReserve(result.data);
+  };
 
   // const imageDatas = React.useMemo(
   //   () => [
@@ -58,6 +75,16 @@ const Main = () => {
   //   ],
   //   []
   // );
+
+  const getDateData = (value: DateRange<any>) => {
+    const startDate = value[0].format("YYYY-MM-DD");
+    const endDate = value[1]?.format("YYYY-MM-DD");
+    setSearchParams({
+      startDate: startDate,
+      endDate: endDate,
+      types: vehicleTypes,
+    });
+  };
 
   return (
     <div>
@@ -102,6 +129,8 @@ const Main = () => {
             >
               <DateRangePicker
                 localeText={{ start: "시작 날짜", end: "종료 날짜" }}
+                onChange={getDateData}
+                format="YY-MM-DD"
               />
               <Typography
                 variant="h6"
@@ -114,7 +143,6 @@ const Main = () => {
               <Box
                 component="form"
                 noValidate
-                onSubmit={handleSubmit}
                 sx={{ mt: 1 }}
                 style={{
                   display: "flex",
@@ -160,6 +188,7 @@ const Main = () => {
                 type="submit"
                 fullWidth
                 variant="contained"
+                onClick={handleSubmit}
                 sx={{ mt: 3, mb: 2 }}
               >
                 차량 조회하고 예약하기

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-const Navigator = () => {
+const useNavigator = () => {
   const navigate = useNavigate();
 
   const moveToLogin = () => {
@@ -11,10 +11,15 @@ const Navigator = () => {
     navigate("/");
   };
 
+  const moveToReserve = (params: any) => {
+    navigate("/reserve", { state: params });
+  };
+
   return {
     moveToLogin,
     moveToMain,
+    moveToReserve,
   };
 };
 
-export default Navigator;
+export default useNavigator;

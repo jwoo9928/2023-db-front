@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { LoginState } from "../store/state";
-import Navigator from "../navigator";
+import useNavigator from "../navigator";
 
 const pages = ["대여", "예약", "예약 확인", "조회"];
 const settings = ["Profile", "Logout"];
@@ -27,7 +27,7 @@ const ResponsiveAppBar = () => {
     null
   );
   const [isLogin, setIsLogin] = useRecoilState<boolean>(LoginState);
-  const navigation = Navigator();
+  const navigation = useNavigator();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -37,6 +37,9 @@ const ResponsiveAppBar = () => {
   };
 
   const handleCloseNavMenu = () => {
+    if (!isLogin) {
+      navigation.moveToLogin();
+    }
     setAnchorElNav(null);
   };
 
